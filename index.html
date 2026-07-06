@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>如何写出更适合产品转化的AI提示词 - 纵向滚动版</title>
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/base.css">
+<link rel="stylesheet" href="assets/animations/animations.css">
+<style>
+/* === VERTICAL HTML-PPT THEME === */
+:root {
+  --bg: #050607;
+  --bg-2: #090c12;
+  --panel: rgba(255,255,255,.045);
+  --panel-strong: rgba(255,255,255,.07);
+  --line: rgba(255,255,255,.09);
+  --line-strong: rgba(255,255,255,.18);
+  --text: #f6f7fb;
+  --muted: rgba(246,247,251,.70);
+  --dim: rgba(246,247,251,.46);
+  --accent: #ff6900;
+  --accent-2: #ff9a3d;
+  --blue: #71b7ff;
+  --gold: #c9a052;
+  --radius: 24px;
+  --radius-lg: 36px;
+  --shadow: 0 30px 90px rgba(0,0,0,.36);
+  --font-cn: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", Arial, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  background: var(--bg);
+}
+
+body.scroll-ppt {
+  margin: 0;
+  min-height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-cn);
+  letter-spacing: 0;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Override html-ppt base slide behavior for vertical scrolling. */
+.deck {
+  position: relative;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  background: var(--bg);
+}
+
+.slide {
+  position: relative;
+  inset: auto;
+  width: 100%;
+  min-height: 100vh;
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
+  overflow: hidden;
+  scroll-snap-align: start;
+  display: flex;
+  justify-content: center;
+  padding: 96px 24px;
+  background:
+    radial-gradient(circle at 50% 10%, rgba(255,255,255,.055), transparent 22%),
+    radial-gradient(circle at 10% 78%, rgba(255,105,0,.075), transparent 28%),
+    radial-gradient(circle at 88% 18%, rgba(113,183,255,.10), transparent 30%),
+    linear-gradient(145deg,#050607 0%,#090c12 54%,#030405 100%);
+}
+
+.slide::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+  background-size: 76px 76px;
+  mask-image: radial-gradient(circle at 50% 45%, black 0%, transparent 72%);
+  opacity: .42;
+  pointer-events: none;
+}
+
+.slide::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 220 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.34'/%3E%3C/svg%3E");
+  opacity: .036;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+.slide.is-active {
+  transform: none;
+}
+
+@supports (scroll-snap-type: y mandatory) {
+  body.scroll-ppt {
+    scroll-snap-type: y proximity;
+  }
+}
+
+.frame {
+  position: relative;
+  z-index: 2;
+  width: min(1180px, 100%);
+  display: grid;
+  align-content: center;
+}
+
+.frame.wide {
+  width: min(1360px, 100%);
+}
+
+.topline {
+  position: absolute;
+  left: max(24px, calc((100vw - 1180px) / 2));
+  right: max(24px, calc((100vw - 1180px) / 2));
+  top: 46px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,105,0,.72), rgba(255,255,255,.16), transparent);
+  z-index: 3;
+  opacity: .85;
+}
+
+.eyebrow, .kicker {
+  margin: 0 0 22px;
+  color: var(--accent);
+  font-size: 13px;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+.h1, .h2, h1, h2, h3, p { margin: 0; }
+
+.hero-title {
+  max-width: 980px;
+  font-size: clamp(48px, 7.2vw, 94px);
+  line-height: 1.08;
+  font-weight: 680;
+  letter-spacing: 0;
+}
+
+.headline {
+  max-width: 980px;
+  font-size: clamp(42px, 5.6vw, 74px);
+  line-height: 1.13;
+  font-weight: 650;
+  letter-spacing: 0;
+}
+
+.lede {
+  margin-top: 28px;
+  max-width: 760px;
+  color: var(--muted);
+  font-size: clamp(19px, 2.2vw, 27px);
+  line-height: 1.62;
+  font-weight: 400;
+}
+
+.accent { color: var(--accent); }
+.muted { color: var(--muted); }
+.dim { color: var(--dim); }
+
+.glass {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+}
+
+.grid {
+  display: grid;
+  gap: 24px;
+}
+
+.g2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.g3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.g4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.g5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+
+.card {
+  padding: 30px;
+  min-height: 148px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+}
+
+.card h3 {
+  margin: 0 0 12px;
+  font-size: 24px;
+  line-height: 1.3;
+  font-weight: 650;
+}
+
+.card p, .card li {
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1.65;
+}
+
+.soft-card {
+  min-height: 132px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 23px;
+  line-height: 1.45;
+  font-weight: 520;
+}
+
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.05fr .95fr;
+  gap: 58px;
+  align-items: center;
+}
+
+.prompt-orbit {
+  position: relative;
+  min-height: 520px;
+  border-radius: 42px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 42%, rgba(255,105,0,.26), transparent 24%),
+    radial-gradient(circle at 56% 66%, rgba(113,183,255,.13), transparent 32%),
+    rgba(255,255,255,.035);
+}
+
+.prompt-orbit .ring {
+  position: absolute;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 50%;
+}
+
+.prompt-orbit .ring.r1 { inset: 70px; }
+.prompt-orbit .ring.r2 { inset: 130px; opacity: .55; }
+.prompt-orbit .core {
+  position: absolute;
+  inset: 190px 170px;
+  border-radius: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(255,105,0,.96), rgba(255,154,61,.68));
+  color: #fff;
+  font-size: 34px;
+  font-weight: 760;
+}
+
+.prompt-orbit .chip {
+  position: absolute;
+  padding: 12px 18px;
+  border-radius: 999px;
+  color: rgba(255,255,255,.86);
+  border: 1px solid rgba(255,255,255,.13);
+  background: rgba(0,0,0,.32);
+  font-size: 16px;
+}
+
+.c1 { left: 74px; top: 96px; }
+.c2 { right: 72px; top: 150px; }
+.c3 { left: 90px; bottom: 108px; }
+.c4 { right: 96px; bottom: 92px; }
+
+.compare {
+  display: grid;
+  grid-template-columns: .9fr 1.1fr;
+  gap: 28px;
+}
+
+.compare .weak { opacity: .6; }
+.compare .strong {
+  border-color: rgba(255,105,0,.32);
+  background: linear-gradient(145deg, rgba(255,105,0,.08), rgba(255,255,255,.04));
+}
+
+.big-quote {
+  max-width: 1040px;
+  font-size: clamp(46px, 6.2vw, 86px);
+  line-height: 1.12;
+  font-weight: 650;
+  text-align: center;
+  margin-inline: auto;
+}
+
+.formula-board {
+  display: grid;
+  gap: 22px;
+}
+
+.formula-tokens {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.formula-token {
+  appearance: none;
+  border: 1px solid rgba(255,255,255,.11);
+  background: rgba(255,255,255,.045);
+  color: rgba(255,255,255,.85);
+  border-radius: 999px;
+  padding: 14px 20px;
+  cursor: pointer;
+  font-size: 17px;
+  transition: transform .18s ease, background .18s ease, border-color .18s ease;
+}
+
+.formula-token:hover { transform: translateY(-2px); }
+.formula-token.active {
+  color: #fff;
+  background: rgba(255,105,0,.18);
+  border-color: rgba(255,105,0,.46);
+}
+
+.formula-detail {
+  min-height: 206px;
+  padding: 34px;
+}
+
+.formula-detail h3 {
+  margin: 0 0 12px;
+  font-size: 30px;
+}
+
+.formula-detail p {
+  color: var(--muted);
+  font-size: 21px;
+  line-height: 1.7;
+}
+
+.codebox {
+  white-space: pre-line;
+  font-size: 18px;
+  line-height: 1.78;
+  color: rgba(255,255,255,.84);
+  position: relative;
+}
+
+.codebox::before {
+  content: "";
+  position: absolute;
+  left: 24px;
+  top: 28px;
+  bottom: 28px;
+  width: 3px;
+  border-radius: 99px;
+  background: linear-gradient(var(--accent), rgba(255,105,0,.18));
+}
+
+.codebox .code-inner { padding-left: 28px; }
+
+.path {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.path-step {
+  min-height: 118px;
+  padding: 18px 14px;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  color: rgba(255,255,255,.88);
+  cursor: pointer;
+  transition: transform .18s ease, border-color .18s ease, background .18s ease;
+}
+
+.path-step:hover,
+.path-step.active {
+  transform: translateY(-3px);
+  border-color: rgba(255,105,0,.36);
+  background: rgba(255,105,0,.12);
+}
+
+.path-detail {
+  margin-top: 24px;
+  min-height: 116px;
+  padding: 28px;
+  color: var(--muted);
+  font-size: 21px;
+  line-height: 1.68;
+}
+
+.checklist {
+  display: grid;
+  gap: 14px;
+}
+
+.check-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,.035);
+  cursor: pointer;
+}
+
+.check-dot {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,.3);
+}
+
+.check-item.done .check-dot {
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 5px rgba(255,105,0,.12);
+}
+
+.check-item span:last-child {
+  color: var(--muted);
+  font-size: 18px;
+}
+
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 13px;
+}
+
+.tag, .tab-btn {
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,.045);
+  color: rgba(255,255,255,.82);
+  border-radius: 999px;
+  padding: 12px 18px;
+  font-size: 16px;
+}
+
+.tab-btn {
+  cursor: pointer;
+  transition: transform .18s ease, background .18s ease, border-color .18s ease;
+}
+
+.tab-btn:hover { transform: translateY(-2px); }
+.tag.hot, .tab-btn.active {
+  color: #fff;
+  border-color: rgba(255,105,0,.38);
+  background: rgba(255,105,0,.15);
+}
+
+.output {
+  min-height: 302px;
+  font-size: 20px;
+  line-height: 1.72;
+  color: rgba(255,255,255,.84);
+}
+
+.output strong { color: #fff; }
+
+.copy-btn {
+  width: fit-content;
+  border: 1px solid rgba(255,105,0,.45);
+  background: rgba(255,105,0,.15);
+  color: #fff;
+  border-radius: 999px;
+  padding: 12px 20px;
+  cursor: pointer;
+}
+
+.nav {
+  position: fixed;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+  display: grid;
+  gap: 10px;
+}
+
+.nav a {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.22);
+  border: 1px solid rgba(255,255,255,.2);
+  text-indent: -999px;
+  overflow: hidden;
+}
+
+.nav a.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 5px rgba(255,105,0,.14);
+}
+
+.progress {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 3px;
+  background: rgba(255,255,255,.08);
+  z-index: 30;
+}
+
+.progress span {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg,var(--accent),var(--accent-2));
+}
+
+.fx-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: .36;
+  pointer-events: none;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity .65s cubic-bezier(.4,0,.2,1), transform .65s cubic-bezier(.4,0,.2,1);
+}
+
+.is-active .reveal {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.is-active .reveal:nth-child(2) { transition-delay: .08s; }
+.is-active .reveal:nth-child(3) { transition-delay: .16s; }
+.is-active .reveal:nth-child(4) { transition-delay: .24s; }
+.is-active .reveal:nth-child(5) { transition-delay: .32s; }
+
+@media (max-width: 920px) {
+  .slide {
+    min-height: auto;
+    padding: 86px 18px;
+  }
+  .hero-grid, .compare, .g2, .g3, .g4, .g5, .path {
+    grid-template-columns: 1fr;
+  }
+  .prompt-orbit {
+    min-height: 380px;
+  }
+  .prompt-orbit .core {
+    inset: 145px 100px;
+  }
+  .nav { display: none; }
+}
+</style>
+</head>
+<body class="scroll-ppt">
+<div class="progress"><span id="progressBar"></span></div>
+<nav class="nav" aria-label="页面导航" id="pageNav"></nav>
+
+<main class="deck">
+  <section class="slide" id="cover" data-title="封面">
+    <div class="fx-layer" data-fx="data-stream"></div>
+    <div class="topline"></div>
+    <div class="frame wide">
+      <div class="hero-grid">
+        <div class="reveal">
+          <p class="kicker">AI Product Prompt Course</p>
+          <h1 class="hero-title">如何写出更适合<br><span class="accent">产品转化</span>的AI提示词</h1>
+          <p class="lede">从产品卖点到详情页、产品海报图、种草文案的 AI 实战课</p>
+          <div class="tag-row" style="margin-top:34px"><span class="tag hot">讲师：张迪</span><span class="tag">电商代理</span><span class="tag">私域销售</span><span class="tag">产品运营</span></div>
+        </div>
+        <div class="prompt-orbit glass reveal">
+          <div class="ring r1"></div><div class="ring r2"></div>
+          <div class="chip c1">产品</div><div class="chip c2">人群</div><div class="chip c3">痛点</div><div class="chip c4">转化</div>
+          <div class="core">PROMPT</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" id="why" data-title="为什么要学">
+    <div class="frame">
+      <p class="kicker reveal">01 / Why</p>
+      <h2 class="big-quote reveal">AI不会自动<br>懂你的<span class="accent">产品</span></h2>
+      <p class="lede reveal" style="margin-inline:auto;text-align:center">你给得越清楚，它做得越精准。</p>
+      <div class="grid g4" style="margin-top:54px">
+        <div class="card soft-card reveal">产品信息不完整</div>
+        <div class="card soft-card reveal">目标人群不明确</div>
+        <div class="card soft-card reveal">核心卖点不具体</div>
+        <div class="card soft-card reveal">输出要求太模糊</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" id="compare" data-title="普通 vs 专业">
+    <div class="frame wide">
+      <p class="kicker reveal">02 / Before & After</p>
+      <h2 class="headline reveal">普通提示词 vs 专业提示词</h2>
+      <div class="compare" style="margin-top:42px">
+        <div class="card weak reveal"><h3>普通提示词</h3><p style="font-size:30px;color:#fff">帮我写一个产品文案</p></div>
+        <div class="card strong reveal"><h3>专业提示词</h3><p style="font-size:27px;color:#fff">你是一位资深电商策划，请根据产品信息、目标人群、用户痛点、核心卖点和使用场景，生成适合详情页的转化文案。</p></div>
+      </div>
+      <p class="lede reveal" style="text-align:center;max-width:none">提示词质量，决定 AI 结果质量。</p>
+    </div>
+  </section>
+
+  <section class="slide" id="deconstruct" data-title="产品拆解">
+    <div class="frame wide">
+      <p class="kicker reveal">03 / Product Clarity</p>
+      <h2 class="headline reveal">不会拆产品<br>就写不出好提示词</h2>
+      <div class="grid g5" style="margin-top:44px">
+        <div class="card reveal"><h3 class="accent">01</h3><p>这是什么产品？</p></div>
+        <div class="card reveal"><h3 class="accent">02</h3><p>解决什么问题？</p></div>
+        <div class="card reveal"><h3 class="accent">03</h3><p>卖给谁？</p></div>
+        <div class="card reveal"><h3 class="accent">04</h3><p>为什么值得买？</p></div>
+        <div class="card reveal"><h3 class="accent">05</h3><p>在什么场景下使用？</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" id="formula" data-title="黄金公式">
+    <div class="fx-layer" data-fx="neural-net"></div>
+    <div class="frame">
+      <p class="kicker reveal">04 / Interactive Formula</p>
+      <h2 class="headline reveal">产品提示词黄金公式</h2>
+      <div class="formula-board glass card reveal" style="margin-top:38px">
+        <div class="formula-tokens" id="formulaTokens"></div>
+        <div class="formula-detail glass" id="formulaDetail"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" id="template" data-title="标准模板">
+    <div class="frame wide">
+      <p class="kicker reveal">05 / Copyable Template</p>
+      <h2 class="headline reveal">一条能卖货的产品提示词</h2>
+      <div class="grid g2" style="margin-top:42px;align-items:center">
+        <div class="reveal">
+          <p class="lede">把产品价值、用户需求和输出要求一次性说清楚，AI 才有机会给出能直接使用的内容。</p>
+          <button class="copy-btn" id="copyBaseTemplate" style="margin-top:28px">复制模板</button>
+        </div>
+        <div class="card codebox reveal"><div class="code-inner" id="baseTemplate">你是一位【角色】，
+请帮我为【产品名称】生成【内容类型】。
+产品信息：【填写】
+目标人群：【填写】
+用户痛点：【填写】
+核心卖点：【填写】
+使用场景：【填写】
+文案风格：【填写】
+输出格式：【填写】</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" id="detail" data-title="详情页路径">
+    <div class="frame wide">
+      <p class="kicker reveal">06 / Detail Page</p>
+      <h2 class="headline reveal">详情页的本质<br>不是介绍产品，而是说服用户下单</h2>
+      <div class="path reveal" id="detailPath" style="margin-top:42px"></div>
+      <div class="path-detail glass reveal" id="pathDetail"></div>
+    </div>
+  </section>
+
+  <section class="slide" id="poster" data-title="海报提示词">
+    <div class="frame wide">
+      <p class="kicker reveal">07 / Poster Prompt</p>
+      <h2 class="headline reveal">海报图提示词<br>不是只写“<span class="accent">好看</span>”</h2>
+      <div class="grid g2" style="margin-top:42px;align-items:start">
+        <div class="card reveal">
+          <h3>海报提示词清单</h3>
+          <div class="checklist" id="posterChecklist" style="margin-top:22px"></div>
+        </div>
+        <div class="card reveal">
+          <h3>案例：儿童除菌洗衣液</h3>
+          <p>设计一张高端电商产品海报，竖版比例 3:4。产品主体是一瓶儿童专用除菌洗衣液，位于画面中央偏下。背景是明亮干净的家庭洗衣房，有柔和阳光、白色毛巾、儿童衣物元素。</p>
+          <p style="margin-top:18px;color:var(--dim)">负面提示词：不要杂乱背景、不要廉价感、不要文字乱码、不要过度卡通。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" id="category" data-title="分类提示词">
+    <div class="frame wide">
+      <p class="kicker reveal">08 / Category Strategy</p>
+      <h2 class="headline reveal">不同产品<br>要用不同提示词</h2>
+      <div class="grid g2" style="margin-top:42px;align-items:start">
+        <div class="card reveal">
+          <h3>选择产品类型</h3>
+          <div class="tag-row" id="categoryTabs" style="margin-top:20px"></div>
+        </div>
+        <div class="card output reveal" id="categoryOutput"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" id="evaluate" data-title="判断结果">
+    <div class="frame wide">
+      <p class="kicker reveal">09 / Evaluation</p>
+      <h2 class="headline reveal">好结果，不只是“看起来不错”</h2>
+      <div class="grid g5" style="margin-top:42px">
+        <div class="card reveal"><h3 class="accent">01</h3><p>是否说清楚产品是什么</p></div>
+        <div class="card reveal"><h3 class="accent">02</h3><p>是否说中了用户痛点</p></div>
+        <div class="card reveal"><h3 class="accent">03</h3><p>是否突出购买理由</p></div>
+        <div class="card reveal"><h3 class="accent">04</h3><p>是否有使用场景</p></div>
+        <div class="card reveal"><h3 class="accent">05</h3><p>是否有转化动作</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" id="lab" data-title="现场实战">
+    <div class="frame wide">
+      <p class="kicker reveal">10 / Prompt Lab</p>
+      <h2 class="headline reveal">现场把一个产品做成完整提示词</h2>
+      <div class="grid g2" style="margin-top:42px;align-items:start">
+        <div class="card reveal">
+          <h3>选择训练目标</h3>
+          <div class="tag-row" id="labTabs" style="margin-top:20px"></div>
+          <div class="tag-row" style="margin-top:28px"><span class="tag hot">填拆解表</span><span class="tag">生成详情页</span><span class="tag">生成海报</span><span class="tag">查看结果</span><span class="tag">二次优化</span></div>
+        </div>
+        <div class="card output reveal" id="labOutput"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="slide" id="end" data-title="结尾">
+    <div class="frame">
+      <h2 class="big-quote reveal">AI不会替你卖货<br>但它能帮你把产品<span class="accent">讲得更清楚</span></h2>
+      <p class="lede reveal" style="margin-inline:auto;text-align:center">会用 AI 的人，不是少干活，而是更快做出好内容。</p>
+    </div>
+  </section>
+</main>
+
+<script src="assets/animations/fx-runtime.js"></script>
+<script>
+/* === VERTICAL SCROLL INTERACTION RUNTIME === */
+(function(){
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const nav = document.getElementById('pageNav');
+  const progress = document.getElementById('progressBar');
+
+  slides.forEach((slide, i) => {
+    const a = document.createElement('a');
+    a.href = `#${slide.id}`;
+    a.textContent = slide.dataset.title || String(i + 1);
+    nav.appendChild(a);
+  });
+  const navItems = Array.from(nav.querySelectorAll('a'));
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      entry.target.classList.toggle('is-active', entry.isIntersecting && entry.intersectionRatio > .45);
+      if (entry.isIntersecting && entry.intersectionRatio > .45) {
+        const idx = slides.indexOf(entry.target);
+        navItems.forEach((item, i) => item.classList.toggle('active', i === idx));
+      }
+    });
+  }, { threshold: [.45, .65] });
+  slides.forEach(slide => io.observe(slide));
+  slides[0].classList.add('is-active');
+  navItems[0]?.classList.add('active');
+
+  function updateProgress(){
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = max <= 0 ? 0 : (window.scrollY / max) * 100;
+    progress.style.width = `${pct}%`;
+  }
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress();
+
+  const formula = [
+    ['角色', '告诉 AI 站在哪个专业视角输出，比如资深电商策划、海报视觉导演、私域销售教练。'],
+    ['产品', '把产品名称、类型、规格、价格、套餐和信任背书写清楚，避免 AI 自己猜。'],
+    ['人群', '明确卖给谁，年龄、身份、消费场景、购买顾虑越具体越好。'],
+    ['痛点', '写出用户真实困扰，内容才会有共鸣，而不是泛泛介绍卖点。'],
+    ['卖点', '卖点不是参数堆砌，而是用户为什么值得买的理由。'],
+    ['场景', '把产品放进生活画面里，详情页、海报、短视频才更容易生成。'],
+    ['风格', '指定语气和审美，比如克制高级、真实种草、强转化、专业可信。'],
+    ['输出格式', '要求 AI 按表格、模块、脚本、海报提示词或朋友圈结构输出。']
+  ];
+  const tokenWrap = document.getElementById('formulaTokens');
+  const formulaDetail = document.getElementById('formulaDetail');
+  formula.forEach((item, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'formula-token';
+    btn.textContent = item[0];
+    btn.addEventListener('click', () => showFormula(i));
+    tokenWrap.appendChild(btn);
+  });
+  function showFormula(i){
+    Array.from(tokenWrap.children).forEach((btn, idx) => btn.classList.toggle('active', idx === i));
+    formulaDetail.innerHTML = `<h3>${formula[i][0]}</h3><p>${formula[i][1]}</p>`;
+  }
+  showFormula(0);
+
+  const pathData = [
+    ['吸引注意', '首屏先让用户停下来，标题要直接指出结果、利益或强痛点。'],
+    ['痛点共鸣', '让用户觉得“这说的是我”，而不是泛泛说产品很好。'],
+    ['卖点说明', '把功能翻译成购买理由，告诉用户它能解决什么。'],
+    ['场景展示', '放进真实使用场景，让用户能想象自己正在用。'],
+    ['信任背书', '用品牌、认证、成分、销量、口碑降低顾虑。'],
+    ['购买理由', '强化价格、套餐、稀缺性、对比优势或限时权益。'],
+    ['立即行动', '明确让用户咨询、下单、进群、领取优惠或保存图片。']
+  ];
+  const path = document.getElementById('detailPath');
+  const pathDetail = document.getElementById('pathDetail');
+  pathData.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'path-step glass';
+    div.textContent = item[0];
+    div.addEventListener('click', () => showPath(i));
+    path.appendChild(div);
+  });
+  function showPath(i){
+    Array.from(path.children).forEach((el, idx) => el.classList.toggle('active', idx === i));
+    pathDetail.textContent = pathData[i][1];
+  }
+  showPath(0);
+
+  const checks = ['产品主体', '使用场景', '背景风格', '光影氛围', '构图方式', '色彩系统', '文案空间', '商业质感', '负面提示词'];
+  const checklist = document.getElementById('posterChecklist');
+  checks.forEach((name, i) => {
+    const item = document.createElement('div');
+    item.className = 'check-item' + (i < 3 ? ' done' : '');
+    item.innerHTML = `<span class="check-dot"></span><span>${name}</span>`;
+    item.addEventListener('click', () => item.classList.toggle('done'));
+    checklist.appendChild(item);
+  });
+
+  const categories = {
+    '食品类': '食品类要让用户有食欲、有信任。提示词重点：好吃、健康、方便、送礼、家庭分享、产地、新鲜。适合生成朋友圈种草、详情页首屏和短视频开头。',
+    '美妆护肤类': '美妆类要让用户看见变美的理由。提示词重点：成分、肤感、功效、使用体验、安全感和精致感。表达要真实克制，不夸大功效。',
+    '家清日化类': '家清类要让用户感到干净、省心、安心。提示词重点：除菌、去污、家庭场景、安全感、性价比和宝妈用户的日常困扰。',
+    '课程服务类': '课程服务类要讲清楚学完能解决什么问题。提示词重点：适合人群、学习结果、交付方式、信任背书和报名行动。'
+  };
+  const categoryTabs = document.getElementById('categoryTabs');
+  const categoryOutput = document.getElementById('categoryOutput');
+  Object.keys(categories).forEach((name, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn';
+    btn.textContent = name;
+    btn.addEventListener('click', () => showCategory(name));
+    categoryTabs.appendChild(btn);
+  });
+  function showCategory(name){
+    Array.from(categoryTabs.children).forEach(btn => btn.classList.toggle('active', btn.textContent === name));
+    categoryOutput.innerHTML = `<strong>${name}</strong><br><br>${categories[name]}`;
+  }
+  showCategory('食品类');
+
+  const labs = {
+    '详情页提示词': '你是一位资深电商详情页策划。请根据【产品信息】【目标人群】【用户痛点】【核心卖点】【使用场景】，输出一套详情页结构，包含首屏标题、痛点模块、卖点模块、场景模块、信任背书、购买理由和排版建议。',
+    '海报图提示词': '你是一位电商视觉创意导演。请为【产品名称】设计一张高端产品海报提示词，包含产品主体、使用场景、背景风格、光影氛围、构图方式、色彩系统、文案空间、商业质感和负面提示词。',
+    '朋友圈种草': '你是一位私域种草文案策划。请为【产品名称】写 3 条朋友圈文案，语气真实、有生活场景、有购买理由，每条包含开头钩子、痛点共鸣、卖点表达和行动引导。',
+    '销售话术': '你是一位私域销售教练。请根据【产品信息】生成销售话术，包含破冰开场、痛点提问、卖点回应、异议处理、成交引导和跟进提醒。'
+  };
+  const labTabs = document.getElementById('labTabs');
+  const labOutput = document.getElementById('labOutput');
+  Object.keys(labs).forEach(name => {
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn';
+    btn.textContent = name;
+    btn.addEventListener('click', () => showLab(name));
+    labTabs.appendChild(btn);
+  });
+  function showLab(name){
+    Array.from(labTabs.children).forEach(btn => btn.classList.toggle('active', btn.textContent === name));
+    labOutput.innerHTML = `<strong>${name}</strong><br><br>${labs[name]}`;
+  }
+  showLab('详情页提示词');
+
+  document.getElementById('copyBaseTemplate').addEventListener('click', async () => {
+    const text = document.getElementById('baseTemplate').innerText;
+    try {
+      await navigator.clipboard.writeText(text);
+      document.getElementById('copyBaseTemplate').textContent = '已复制';
+    } catch {
+      document.getElementById('copyBaseTemplate').textContent = '请手动复制';
+    }
+    setTimeout(() => document.getElementById('copyBaseTemplate').textContent = '复制模板', 1400);
+  });
+})();
+</script>
+</body>
+</html>
