@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme-base="assets/themes/" data-themes="tokyo-night,glassmorphism,catppuccin-mocha,corporate-clean">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>如何写出更适合产品转化的AI提示词</title>
+<link rel="stylesheet" href="assets/fonts.css">
+<link rel="stylesheet" href="assets/base.css">
+<link rel="stylesheet" href="assets/animations/animations.css">
+<link rel="stylesheet" id="theme-link" href="assets/themes/tokyo-night.css">
+<style>
+/* === HTML-PPT COURSE TEMPLATE === */
+body.ai-course {
+  --bg: #050608;
+  --bg-soft: #0a0d14;
+  --surface: rgba(255,255,255,.045);
+  --surface-2: rgba(255,255,255,.065);
+  --border: rgba(255,255,255,.09);
+  --border-strong: rgba(255,255,255,.18);
+  --text-1: #f6f7fb;
+  --text-2: rgba(246,247,251,.72);
+  --text-3: rgba(246,247,251,.48);
+  --accent: #ff6900;
+  --accent-2: #ff9a3d;
+  --accent-3: #6eb8ff;
+  --grad: linear-gradient(120deg,#ff6900 0%,#ff9a3d 52%,#b98d4a 100%);
+  --grad-soft: linear-gradient(135deg,rgba(255,105,0,.16),rgba(110,184,255,.08));
+  --radius: 22px;
+  --radius-lg: 30px;
+  --shadow: 0 28px 80px rgba(0,0,0,.32);
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", Arial, sans-serif;
+  overflow: hidden;
+}
+
+body.ai-course .deck {
+  background: #050608;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1920px;
+  height: 1080px;
+  transform-origin: 0 0;
+  overflow: hidden;
+}
+
+body.ai-course .slide {
+  width: 1920px;
+  height: 1080px;
+  padding: 86px 118px;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255,255,255,.06), transparent 25%),
+    radial-gradient(circle at 12% 82%, rgba(255,105,0,.08), transparent 28%),
+    radial-gradient(circle at 86% 12%, rgba(90,150,255,.1), transparent 30%),
+    linear-gradient(145deg,#050608 0%,#090c13 54%,#030405 100%);
+  color: var(--text-1);
+}
+
+body.ai-course .slide::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px);
+  background-size: 76px 76px;
+  mask-image: radial-gradient(circle at 50% 45%, black 0%, transparent 72%);
+  opacity: .48;
+  pointer-events: none;
+}
+
+body.ai-course .slide::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 220 220' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.86' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.34'/%3E%3C/svg%3E");
+  opacity: .036;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+body.ai-course .slide > * {
+  position: relative;
+  z-index: 2;
+}
+
+body.ai-course .dark-panel,
+body.ai-course .card,
+body.ai-course .feature-card,
+body.ai-course .tool-card,
+body.ai-course .metric-card {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(20px);
+}
+
+body.ai-course .h1 {
+  font-size: 76px;
+  line-height: 1.12;
+  font-weight: 650;
+  letter-spacing: 0;
+}
+
+body.ai-course .h1.giant {
+  font-size: 90px;
+  line-height: 1.13;
+}
+
+body.ai-course .h2 {
+  font-size: 62px;
+  line-height: 1.16;
+  font-weight: 650;
+  letter-spacing: 0;
+}
+
+body.ai-course .lede {
+  color: var(--text-2);
+  font-size: 25px;
+  line-height: 1.65;
+  font-weight: 400;
+}
+
+body.ai-course .kicker {
+  color: var(--accent);
+  letter-spacing: .06em;
+  font-weight: 650;
+}
+
+body.ai-course .accent {
+  color: var(--accent);
+}
+
+body.ai-course .muted {
+  color: var(--text-2);
+}
+
+body.ai-course .center-stage {
+  align-items: center;
+  text-align: center;
+}
+
+body.ai-course .course-brand {
+  position: absolute;
+  left: 118px;
+  top: 46px;
+  font-size: 13px;
+  color: var(--text-3);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+body.ai-course .deck-footer {
+  left: 118px;
+  right: 118px;
+  bottom: 34px;
+}
+
+body.ai-course .hairline {
+  position: absolute;
+  left: 118px;
+  right: 118px;
+  height: 1px;
+  background: linear-gradient(90deg,transparent,rgba(255,105,0,.72),rgba(255,255,255,.16),transparent);
+  box-shadow: 0 0 26px rgba(255,105,0,.12);
+  z-index: 2;
+}
+
+body.ai-course .hairline.top {
+  top: 104px;
+}
+
+body.ai-course .hairline.bottom {
+  bottom: 112px;
+}
+
+body.ai-course .orb {
+  position: absolute;
+  width: 640px;
+  height: 640px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,105,0,.14);
+  right: -260px;
+  top: -260px;
+  z-index: 1;
+}
+
+body.ai-course .title-grid {
+  display: grid;
+  grid-template-columns: 1.1fr .9fr;
+  gap: 72px;
+  align-items: center;
+}
+
+body.ai-course .hero-visual {
+  position: relative;
+  height: 540px;
+  border-radius: 42px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.09);
+  background:
+    radial-gradient(circle at 50% 38%, rgba(255,105,0,.26), transparent 24%),
+    radial-gradient(circle at 55% 62%, rgba(110,184,255,.12), transparent 32%),
+    rgba(255,255,255,.035);
+  box-shadow: var(--shadow);
+}
+
+body.ai-course .hero-visual .formula-ring {
+  position: absolute;
+  inset: 70px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 50%;
+}
+
+body.ai-course .hero-visual .core {
+  position: absolute;
+  inset: 165px;
+  border-radius: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(255,105,0,.92), rgba(255,154,61,.68));
+  color: #fff;
+  font-size: 34px;
+  font-weight: 700;
+}
+
+body.ai-course .hero-visual .chip {
+  position: absolute;
+  padding: 12px 18px;
+  border-radius: 999px;
+  background: rgba(0,0,0,.3);
+  border: 1px solid rgba(255,255,255,.12);
+  color: rgba(255,255,255,.86);
+  font-size: 16px;
+}
+
+body.ai-course .chip.c1 { left: 84px; top: 100px; }
+body.ai-course .chip.c2 { right: 64px; top: 150px; }
+body.ai-course .chip.c3 { left: 92px; bottom: 108px; }
+body.ai-course .chip.c4 { right: 94px; bottom: 90px; }
+
+body.ai-course .problem-grid,
+body.ai-course .five-grid,
+body.ai-course .poster-grid,
+body.ai-course .judge-grid {
+  display: grid;
+  gap: 24px;
+}
+
+body.ai-course .problem-grid {
+  grid-template-columns: repeat(4,1fr);
+}
+
+body.ai-course .five-grid {
+  grid-template-columns: repeat(5,1fr);
+}
+
+body.ai-course .poster-grid {
+  grid-template-columns: repeat(3,1fr);
+  max-width: 1060px;
+}
+
+body.ai-course .judge-grid {
+  grid-template-columns: repeat(5,1fr);
+}
+
+body.ai-course .mini-card {
+  min-height: 140px;
+  padding: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 24px;
+  line-height: 1.42;
+  color: var(--text-1);
+}
+
+body.ai-course .num-card {
+  min-height: 190px;
+  padding: 30px 24px;
+}
+
+body.ai-course .num-card .num {
+  color: var(--accent);
+  font-size: 20px;
+  font-weight: 700;
+}
+
+body.ai-course .num-card p {
+  margin: 34px 0 0;
+  font-size: 23px;
+  line-height: 1.42;
+}
+
+body.ai-course .compare {
+  display: grid;
+  grid-template-columns: 1fr 1.08fr;
+  gap: 38px;
+}
+
+body.ai-course .compare .tool-card {
+  min-height: 330px;
+  padding: 44px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+body.ai-course .compare .weak {
+  opacity: .62;
+}
+
+body.ai-course .compare h3 {
+  font-size: 24px;
+  color: var(--text-2);
+}
+
+body.ai-course .compare p {
+  font-size: 31px;
+  line-height: 1.48;
+}
+
+body.ai-course .compare .strong {
+  border-color: rgba(255,105,0,.26);
+  background: linear-gradient(145deg,rgba(255,105,0,.07),rgba(255,255,255,.04));
+}
+
+body.ai-course .info-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 21px;
+}
+
+body.ai-course .info-table td {
+  padding: 15px 12px;
+  border-top: 1px solid rgba(255,255,255,.055);
+}
+
+body.ai-course .info-table tr:first-child td {
+  border-top: 0;
+}
+
+body.ai-course .info-table td:first-child {
+  width: 190px;
+  color: var(--text-1);
+  font-weight: 650;
+}
+
+body.ai-course .info-table td:last-child {
+  color: var(--text-2);
+}
+
+body.ai-course .formula-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  justify-content: center;
+  max-width: 1160px;
+}
+
+body.ai-course .formula-token {
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(255,255,255,.18);
+  font-size: 35px;
+  font-weight: 560;
+}
+
+body.ai-course .plus {
+  color: var(--accent);
+  font-size: 40px;
+  align-self: center;
+}
+
+body.ai-course .codebox {
+  position: relative;
+  padding: 40px 48px 40px 62px;
+  white-space: pre-line;
+  font-size: 22px;
+  line-height: 1.82;
+  color: rgba(255,255,255,.86);
+}
+
+body.ai-course .codebox::before {
+  content: "";
+  position: absolute;
+  left: 30px;
+  top: 40px;
+  bottom: 40px;
+  width: 3px;
+  border-radius: 20px;
+  background: linear-gradient(var(--accent),rgba(255,105,0,.18));
+}
+
+body.ai-course .flow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+body.ai-course .node {
+  min-width: 150px;
+  min-height: 104px;
+  padding: 20px;
+  border-radius: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border: 1px solid rgba(255,255,255,.09);
+  background: rgba(255,255,255,.04);
+  font-size: 21px;
+  font-weight: 550;
+}
+
+body.ai-course .arrow {
+  width: 34px;
+  height: 1px;
+  background: linear-gradient(90deg,rgba(255,105,0,.1),rgba(255,105,0,.68));
+  position: relative;
+}
+
+body.ai-course .arrow::after {
+  content: "";
+  position: absolute;
+  right: -2px;
+  top: -4px;
+  width: 8px;
+  height: 8px;
+  border-top: 1px solid rgba(255,105,0,.8);
+  border-right: 1px solid rgba(255,105,0,.8);
+  transform: rotate(45deg);
+}
+
+body.ai-course .template-cols,
+body.ai-course .case-cols,
+body.ai-course .lab-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 34px;
+}
+
+body.ai-course .tool-card {
+  padding: 38px 42px;
+}
+
+body.ai-course .tool-card h3 {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+body.ai-course .tool-card p,
+body.ai-course .tool-card li {
+  color: var(--text-2);
+  font-size: 21px;
+  line-height: 1.72;
+}
+
+body.ai-course .tool-card ol {
+  margin: 0;
+  padding-left: 28px;
+}
+
+body.ai-course .tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+body.ai-course .tag {
+  padding: 13px 22px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.09);
+  background: rgba(255,255,255,.045);
+  font-size: 20px;
+  color: rgba(255,255,255,.86);
+}
+
+body.ai-course .tag.hot,
+body.ai-course .tag.is-active {
+  color: #fff;
+  border-color: rgba(255,105,0,.35);
+  background: rgba(255,105,0,.12);
+}
+
+body.ai-course .category-copy {
+  max-width: 880px;
+  font-size: 25px;
+  color: var(--text-2);
+  line-height: 1.65;
+}
+
+body.ai-course .interactive-lab .product-tabs {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+body.ai-course .interactive-lab button {
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.045);
+  color: rgba(255,255,255,.78);
+  border-radius: 999px;
+  padding: 11px 18px;
+  cursor: pointer;
+  transition: background .2s ease, border-color .2s ease, transform .2s ease;
+}
+
+body.ai-course .interactive-lab button:hover {
+  transform: translateY(-1px);
+}
+
+body.ai-course .interactive-lab button.active {
+  color: #fff;
+  background: rgba(255,105,0,.18);
+  border-color: rgba(255,105,0,.42);
+}
+
+body.ai-course .prompt-output {
+  min-height: 320px;
+  font-size: 21px;
+  line-height: 1.72;
+  color: rgba(255,255,255,.84);
+}
+
+body.ai-course .prompt-output strong {
+  color: #fff;
+}
+
+body.ai-course .fx-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: .4;
+  pointer-events: none;
+}
+
+body.ai-course .theme-chip {
+  position: fixed;
+  top: 14px;
+  right: 16px;
+  z-index: 30;
+  color: rgba(255,255,255,.44);
+  font-size: 12px;
+  pointer-events: none;
+}
+</style>
+</head>
+<body class="ai-course">
+<div class="theme-chip">T: <span class="theme-indicator">tokyo-night</span> · O 总览 · S 演讲者 · N 讲稿</div>
+<div class="deck">
+
+  <section class="slide is-active" data-title="封面">
+    <div class="fx-layer" data-fx="data-stream"></div>
+    <div class="hairline top"></div><div class="hairline bottom"></div><div class="orb"></div>
+    <div class="course-brand">AI PRODUCT PROMPT COURSE</div>
+    <div class="title-grid">
+      <div>
+        <p class="kicker anim-fade-up">从产品卖点到转化内容</p>
+        <h1 class="h1 giant anim-rise-in">如何写出更适合<br>产品转化的<span class="accent">AI提示词</span></h1>
+        <p class="lede mt-l">从详情页、海报图，到朋友圈种草文案的 AI 实战课</p>
+        <p class="dim mt-l">讲师：张迪</p>
+      </div>
+      <div class="hero-visual anim-perspective-zoom">
+        <div class="formula-ring"></div><div class="formula-ring" style="inset:120px;opacity:.5"></div>
+        <div class="chip c1">产品</div><div class="chip c2">人群</div><div class="chip c3">痛点</div><div class="chip c4">转化</div>
+        <div class="core">PROMPT</div>
+      </div>
+    </div>
+    <div class="deck-footer"><span>HTML PPT Studio</span><span class="slide-number" data-current="1" data-total="22"></span></div>
+    <aside class="notes">开场先建立课程定位：这不是教大家“玩 AI”，而是教大家把产品信息翻译成 AI 听得懂、能生成、能卖货的提示词。提醒学员：今天的目标很实际，课后能拿一个产品，直接做出详情页、海报图、种草文案和销售话术。</aside>
+  </section>
+
+  <section class="slide center center-stage" data-title="AI不会自动懂产品">
+    <div class="orb"></div>
+    <h1 class="h1 giant anim-blur-in">AI不会自动<br>懂你的<span class="accent">产品</span></h1>
+    <p class="lede mt-l">你给得越清楚，它做得越精准</p>
+    <div class="deck-footer"><span>01 / 认知</span><span class="slide-number" data-current="2" data-total="22"></span></div>
+    <aside class="notes">这一页不要急着解释很多。停顿一下，让大家意识到：AI并不是销售，它不知道你的产品优势、不知道用户为什么买，也不知道平台场景。它只会根据你给的信息工作。你给得模糊，它就生成模糊内容。</aside>
+  </section>
+
+  <section class="slide center-stage" data-title="效果不好的原因">
+    <h1 class="h1 anim-fade-up">不是AI不好用<br>而是你没说清楚</h1>
+    <div class="problem-grid mt-l anim-stagger-list">
+      <div class="dark-panel mini-card">产品信息不完整</div>
+      <div class="dark-panel mini-card">目标人群不明确</div>
+      <div class="dark-panel mini-card">核心卖点不具体</div>
+      <div class="dark-panel mini-card">输出要求太模糊</div>
+    </div>
+    <div class="deck-footer"><span>常见问题</span><span class="slide-number" data-current="3" data-total="22"></span></div>
+    <aside class="notes">把问题归因从“AI不行”转回“输入不清楚”。你可以让学员回想自己平时是不是常写“帮我写一段产品文案”。这种提示词没有产品、没有人群、没有痛点，也没有输出目标，所以结果自然泛泛而谈。</aside>
+  </section>
+
+  <section class="slide" data-title="普通 vs 专业">
+    <p class="kicker">Before / After</p>
+    <h2 class="h2">普通提示词 vs 专业提示词</h2>
+    <div class="compare mt-l">
+      <div class="tool-card weak anim-fade-left"><h3>普通提示词</h3><p>帮我写一个产品文案</p></div>
+      <div class="tool-card strong anim-fade-right"><h3>专业提示词</h3><p>你是一位资深电商策划，请根据产品信息、目标人群、用户痛点、核心卖点和使用场景，生成适合详情页的转化文案。</p></div>
+    </div>
+    <p class="lede mt-l tc">提示词质量，决定AI结果质量</p>
+    <div class="deck-footer"><span>质量差异</span><span class="slide-number" data-current="4" data-total="22"></span></div>
+    <aside class="notes">这一页可以现场读一遍左右两边，让大家感受到差别。专业提示词不是更长而已，而是结构更完整：角色、产品信息、人群、痛点、卖点、场景和输出方向都出现了。AI有了边界，结果才稳定。</aside>
+  </section>
+
+  <section class="slide center center-stage" data-title="先拆产品">
+    <h1 class="h1 giant anim-rise-in">不会拆产品<br>就写不出好提示词</h1>
+    <p class="lede mt-l">提示词的本质，是把产品价值讲清楚。</p>
+    <div class="deck-footer"><span>产品拆解</span><span class="slide-number" data-current="5" data-total="22"></span></div>
+    <aside class="notes">从这里进入方法论。强调：写提示词之前，先不要打开 AI。先在纸上或表格里拆产品。因为提示词不是魔法咒语，而是对产品价值的结构化表达。</aside>
+  </section>
+
+  <section class="slide center-stage" data-title="产品拆解五问">
+    <p class="kicker">Product Clarity</p>
+    <h2 class="h2">产品拆解五问</h2>
+    <div class="five-grid mt-l anim-stagger-list">
+      <div class="dark-panel num-card"><span class="num">01</span><p>这是什么产品？</p></div>
+      <div class="dark-panel num-card"><span class="num">02</span><p>解决什么问题？</p></div>
+      <div class="dark-panel num-card"><span class="num">03</span><p>卖给谁？</p></div>
+      <div class="dark-panel num-card"><span class="num">04</span><p>为什么值得买？</p></div>
+      <div class="dark-panel num-card"><span class="num">05</span><p>在什么场景下使用？</p></div>
+    </div>
+    <div class="deck-footer"><span>五问框架</span><span class="slide-number" data-current="6" data-total="22"></span></div>
+    <aside class="notes">这里可以请学员拿自己的产品代入。五个问题看起来简单，但只要答清楚，后面的详情页、海报、朋友圈和短视频都会更顺。尤其是“卖给谁”和“为什么值得买”，决定了内容有没有转化力。</aside>
+  </section>
+
+  <section class="slide" data-title="拆解表">
+    <p class="kicker">Worksheet</p>
+    <h2 class="h2">先把产品说清楚</h2>
+    <div class="tool-card mt-l">
+      <table class="info-table">
+        <tbody>
+          <tr><td>产品名称</td><td>具体产品是什么</td><td>产品类型</td><td>食品 / 美妆 / 家清 / 服饰 / 课程等</td></tr>
+          <tr><td>目标人群</td><td>卖给谁</td><td>用户痛点</td><td>用户有什么困扰</td></tr>
+          <tr><td>核心卖点</td><td>产品有什么优势</td><td>使用场景</td><td>什么时候、在哪里用</td></tr>
+          <tr><td>价格优势</td><td>是否划算、优惠、套餐</td><td>信任背书</td><td>品牌、认证、成分、销量、口碑</td></tr>
+          <tr><td>转化目标</td><td>种草、咨询、下单、进群</td><td>内容类型</td><td>详情页 / 海报 / 脚本 / 话术</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="deck-footer"><span>工具表</span><span class="slide-number" data-current="7" data-total="22"></span></div>
+    <aside class="notes">这一页是现场实操的基础。建议大家先不要追求文案漂亮，先追求信息完整。产品名称、目标人群、用户痛点、核心卖点、信任背书和转化目标，只要填得越具体，后面 AI 的输出就越接近可用稿。</aside>
+  </section>
+
+  <section class="slide center center-stage" data-title="黄金公式">
+    <div class="fx-layer" data-fx="neural-net"></div>
+    <p class="kicker">Prompt Formula</p>
+    <div class="formula-line mt-l anim-ripple-reveal">
+      <span class="formula-token">角色</span><span class="plus">+</span>
+      <span class="formula-token">产品</span><span class="plus">+</span>
+      <span class="formula-token">人群</span><span class="plus">+</span>
+      <span class="formula-token">痛点</span><span class="plus">+</span>
+      <span class="formula-token">卖点</span><span class="plus">+</span>
+      <span class="formula-token">场景</span><span class="plus">+</span>
+      <span class="formula-token">风格</span><span class="plus">+</span>
+      <span class="formula-token">输出格式</span>
+    </div>
+    <div class="deck-footer"><span>黄金公式</span><span class="slide-number" data-current="8" data-total="22"></span></div>
+    <aside class="notes">这一页是全课核心公式。讲的时候不要念得太快，可以逐个解释：角色决定专业视角，产品决定素材，人群和痛点决定说服对象，卖点和场景决定内容方向，风格和输出格式决定最终可用性。</aside>
+  </section>
+
+  <section class="slide" data-title="标准提示词模板">
+    <p class="kicker">Copyable Template</p>
+    <h2 class="h2">一条能卖货的产品提示词</h2>
+    <div class="grid g2 mt-l" style="align-items:center">
+      <p class="lede">把产品价值、用户需求和输出要求一次性说清楚，AI才有机会给出能直接使用的内容。</p>
+      <div class="tool-card codebox">你是一位【角色】，
+请帮我为【产品名称】生成【内容类型】。
+产品信息：【填写】
+目标人群：【填写】
+用户痛点：【填写】
+核心卖点：【填写】
+使用场景：【填写】
+文案风格：【填写】
+输出格式：【填写】</div>
+    </div>
+    <div class="deck-footer"><span>标准模板</span><span class="slide-number" data-current="9" data-total="22"></span></div>
+    <aside class="notes">告诉学员：以后不要从空白开始写提示词，就从这个模板开始填。填得越具体，输出越稳定。尤其是“内容类型”和“输出格式”，要明确到平台和形态，比如详情页结构、朋友圈三段式、短视频脚本表格。</aside>
+  </section>
+
+  <section class="slide center center-stage" data-title="详情页本质">
+    <h1 class="h1 giant anim-blur-in">详情页的本质<br>不是介绍产品<br>而是说服用户下单</h1>
+    <p class="lede mt-l">从注意力，到信任，再到行动。</p>
+    <div class="deck-footer"><span>详情页</span><span class="slide-number" data-current="10" data-total="22"></span></div>
+    <aside class="notes">这一页建立详情页认知。详情页不是产品说明书，它是一条购买决策路径。用户不是因为你介绍得全面才下单，而是因为你说中了需求、证明了价值、降低了顾虑，并给了行动理由。</aside>
+  </section>
+
+  <section class="slide center-stage" data-title="详情页路径">
+    <p class="kicker">Decision Path</p>
+    <h2 class="h2">一个高转化详情页的路径</h2>
+    <div class="flow mt-l anim-path-draw">
+      <div class="node">吸引注意</div><div class="arrow"></div><div class="node">痛点共鸣</div><div class="arrow"></div>
+      <div class="node">卖点说明</div><div class="arrow"></div><div class="node">场景展示</div><div class="arrow"></div>
+      <div class="node">信任背书</div><div class="arrow"></div><div class="node">购买理由</div><div class="arrow"></div><div class="node">立即行动</div>
+    </div>
+    <div class="deck-footer"><span>转化路径</span><span class="slide-number" data-current="11" data-total="22"></span></div>
+    <aside class="notes">把详情页理解成一条路径，而不是一堆模块。先抓住注意力，再让用户觉得“这说的是我”，接着解释卖点、展示场景、建立信任，最后给出购买理由和行动指令。提示词也要按这个路径写。</aside>
+  </section>
+
+  <section class="slide" data-title="详情页模板">
+    <p class="kicker">Detail Page Prompt</p>
+    <h2 class="h2">详情页提示词模板</h2>
+    <div class="template-cols mt-l">
+      <div class="tool-card"><h3>角色与任务</h3><p>你是一位资深电商详情页策划。请根据以下产品信息，帮我设计一套适合电商平台的产品详情页结构和文案。</p></div>
+      <div class="tool-card"><h3>按照购买决策逻辑输出</h3><ol><li>首屏标题 / 副标题</li><li>痛点模块 / 卖点模块</li><li>场景模块 / 信任背书模块</li><li>购买理由 / 排版建议</li></ol></div>
+    </div>
+    <div class="deck-footer"><span>详情页模板</span><span class="slide-number" data-current="12" data-total="22"></span></div>
+    <aside class="notes">这里可以强调“按购买决策逻辑输出”这句话。很多人让 AI 写详情页，只得到一段普通文案。我们要让 AI 输出结构、模块、标题、卖点和排版建议，这样结果才更像可交付的详情页方案。</aside>
+  </section>
+
+  <section class="slide center center-stage" data-title="海报提示词">
+    <h1 class="h1 giant anim-rise-in">海报图提示词<br>不是只写“<span class="accent">好看</span>”</h1>
+    <p class="lede mt-l">而是告诉AI：画面如何帮助产品卖出去。</p>
+    <div class="deck-footer"><span>海报图</span><span class="slide-number" data-current="13" data-total="22"></span></div>
+    <aside class="notes">讲海报图时，要把“审美”拉回“转化”。好看只是结果，不是提示词。提示词应该描述主体、场景、光影、构图、色彩、商业质感和文案空间。这样生成图才更适合电商使用。</aside>
+  </section>
+
+  <section class="slide center-stage" data-title="海报公式">
+    <p class="kicker">Visual Prompt Formula</p>
+    <h2 class="h2">产品海报图提示词公式</h2>
+    <div class="poster-grid mt-l anim-stagger-list">
+      <div class="dark-panel mini-card">产品主体</div><div class="dark-panel mini-card">使用场景</div><div class="dark-panel mini-card">背景风格</div>
+      <div class="dark-panel mini-card">光影氛围</div><div class="dark-panel mini-card">构图方式</div><div class="dark-panel mini-card">色彩系统</div>
+      <div class="dark-panel mini-card">文案空间</div><div class="dark-panel mini-card">商业质感</div><div class="dark-panel mini-card">负面提示词</div>
+    </div>
+    <div class="deck-footer"><span>视觉公式</span><span class="slide-number" data-current="14" data-total="22"></span></div>
+    <aside class="notes">这一页可以作为海报提示词检查清单。特别提醒“文案空间”和“负面提示词”很重要。商业海报通常需要标题和卖点区域，如果不提前告诉 AI，画面很容易挤满元素，后期无法排版。</aside>
+  </section>
+
+  <section class="slide" data-title="海报案例">
+    <p class="kicker">Case Study</p>
+    <h2 class="h2">案例：儿童除菌洗衣液海报</h2>
+    <div class="case-cols mt-l">
+      <div class="tool-card"><h3>正向提示词</h3><p>设计一张高端电商产品海报，竖版比例3:4。产品主体是一瓶儿童专用除菌洗衣液，位于画面中央偏下。背景是明亮干净的家庭洗衣房，有柔和阳光、白色毛巾、儿童衣物元素。整体风格温暖、安心、干净、有母婴产品质感。画面上方预留标题空间，下方预留卖点文字空间。</p></div>
+      <div class="tool-card"><h3>负面提示词</h3><p>不要杂乱背景、不要廉价感、不要文字乱码、不要过度卡通。</p></div>
+    </div>
+    <div class="deck-footer"><span>案例拆解</span><span class="slide-number" data-current="15" data-total="22"></span></div>
+    <aside class="notes">用这个案例拆给学员看：它不是在说“漂亮、干净”这么简单，而是明确了比例、主体位置、家庭场景、光线、母婴质感、文案空间和负面限制。这样的提示词更像给设计师的创意简报。</aside>
+  </section>
+
+  <section class="slide center center-stage" data-title="不同产品不同提示词">
+    <h1 class="h1 giant">不同产品<br>要用不同提示词</h1>
+    <div class="tag-row mt-l" style="justify-content:center">
+      <span class="tag hot">食品类</span><span class="tag">美妆护肤类</span><span class="tag">家清日化类</span><span class="tag">服饰类</span><span class="tag">课程服务类</span>
+    </div>
+    <div class="deck-footer"><span>分类策略</span><span class="slide-number" data-current="16" data-total="22"></span></div>
+    <aside class="notes">强调不要用一套提示词打所有产品。食品要让人有食欲，美妆要让人看见变美理由，家清要让人感到干净省心。品类不同，用户购买动机不同，提示词方向也必须不同。</aside>
+  </section>
+
+  <section class="slide" data-title="食品类">
+    <p class="kicker">Food</p>
+    <h2 class="h2">食品类：让用户有食欲、有信任</h2>
+    <div class="tag-row mt-l"><span class="tag hot">好吃</span><span class="tag">健康</span><span class="tag">方便</span><span class="tag">送礼</span><span class="tag">家庭分享</span><span class="tag">产地</span><span class="tag">新鲜</span></div>
+    <p class="category-copy mt-l">突出食欲感、生活感、真实感，适合朋友圈和详情页。</p>
+    <div class="deck-footer"><span>食品类方向</span><span class="slide-number" data-current="17" data-total="22"></span></div>
+    <aside class="notes">食品类要让用户“想吃、敢买、觉得合适”。所以提示词里要多出现口感、场景、产地、新鲜、家庭分享、送礼等信息。如果只是写成成分介绍，转化感会弱很多。</aside>
+  </section>
+
+  <section class="slide" data-title="美妆类">
+    <p class="kicker">Beauty</p>
+    <h2 class="h2">美妆类：让用户看见变美的理由</h2>
+    <div class="tag-row mt-l"><span class="tag hot">成分</span><span class="tag">肤感</span><span class="tag">功效</span><span class="tag">安全</span><span class="tag">使用体验</span><span class="tag">精致感</span></div>
+    <p class="category-copy mt-l">真实种草、有画面感，不夸大功效。</p>
+    <div class="deck-footer"><span>美妆类方向</span><span class="slide-number" data-current="18" data-total="22"></span></div>
+    <aside class="notes">美妆类要注意真实感和合规感。提示词可以强调成分、肤感、使用体验和精致感，但不要让 AI 夸大功效。种草文案尤其要像真实用户体验，而不是硬广。</aside>
+  </section>
+
+  <section class="slide" data-title="家清类">
+    <p class="kicker">Home Care</p>
+    <h2 class="h2">家清类：让用户感到干净、省心、安心</h2>
+    <div class="tag-row mt-l"><span class="tag hot">干净</span><span class="tag">省心</span><span class="tag">除菌</span><span class="tag">去污</span><span class="tag">家庭场景</span><span class="tag">安全感</span><span class="tag">性价比</span></div>
+    <p class="category-copy mt-l">安心、实用、有生活场景，适合宝妈和家庭用户。</p>
+    <div class="deck-footer"><span>家清类方向</span><span class="slide-number" data-current="19" data-total="22"></span></div>
+    <aside class="notes">家清类用户关心的是省不省心、干不干净、家人用着安不安全。提示词里要多给生活场景，比如孩子衣物、厨房油污、宠物家庭、卫生间清洁等，让 AI 生成更贴近实际使用的内容。</aside>
+  </section>
+
+  <section class="slide center-stage" data-title="判断标准">
+    <p class="kicker">Evaluation</p>
+    <h2 class="h2">好结果，不只是“看起来不错”</h2>
+    <div class="judge-grid mt-l anim-stagger-list">
+      <div class="dark-panel num-card"><span class="num">01</span><p>是否说清楚产品是什么</p></div>
+      <div class="dark-panel num-card"><span class="num">02</span><p>是否说中了用户痛点</p></div>
+      <div class="dark-panel num-card"><span class="num">03</span><p>是否突出购买理由</p></div>
+      <div class="dark-panel num-card"><span class="num">04</span><p>是否有使用场景</p></div>
+      <div class="dark-panel num-card"><span class="num">05</span><p>是否有转化动作</p></div>
+    </div>
+    <div class="deck-footer"><span>结果判断</span><span class="slide-number" data-current="20" data-total="22"></span></div>
+    <aside class="notes">这一页是检查标准。不要只看文案顺不顺、图好不好看，要看它有没有完成销售任务。一个好结果应该让用户知道是什么、为什么适合我、为什么值得买、在什么场景用，以及下一步怎么行动。</aside>
+  </section>
+
+  <section class="slide interactive-lab" data-title="现场实战">
+    <p class="kicker">Interactive Lab</p>
+    <h2 class="h2">现场把一个产品做成完整提示词</h2>
+    <div class="lab-cols mt-l">
+      <div class="tool-card">
+        <h3>选择产品类型</h3>
+        <div class="product-tabs mt-m">
+          <button class="active" data-kind="食品">食品类</button>
+          <button data-kind="美妆">美妆类</button>
+          <button data-kind="家清">家清类</button>
+          <button data-kind="课程">课程服务</button>
+        </div>
+        <div class="tag-row mt-l"><span class="tag hot">Step 1 填表</span><span class="tag">Step 2 详情页</span><span class="tag">Step 3 海报</span><span class="tag">Step 4 查看结果</span><span class="tag">Step 5 优化</span></div>
+      </div>
+      <div class="tool-card prompt-output" id="promptOutput"></div>
+    </div>
+    <div class="deck-footer"><span>可交互训练页</span><span class="slide-number" data-current="21" data-total="22"></span></div>
+    <aside class="notes">这页可以现场互动。让学员说一个产品类型，点击对应按钮，右侧会生成提示词骨架。提醒他们：这个骨架还不是最终答案，还需要把自己的产品信息填进去。现场可以拿一个真实产品演示一遍。</aside>
+  </section>
+
+  <section class="slide center center-stage" data-title="结尾">
+    <div class="hairline bottom"></div>
+    <h1 class="h1 giant anim-blur-in">AI不会替你卖货<br>但它能帮你把产品<span class="accent">讲得更清楚</span></h1>
+    <p class="lede mt-l">会用AI的人，不是少干活，而是更快做出好内容。</p>
+    <div class="deck-footer"><span>谢谢观看</span><span class="slide-number" data-current="22" data-total="22"></span></div>
+    <aside class="notes">收尾时回到课程主旨：AI不是替代销售判断，而是放大产品表达能力。只要你能拆清楚产品、讲清楚人群痛点、写清楚输出要求，AI就能帮你更快生成详情页、海报、短视频和销售话术。</aside>
+  </section>
+
+</div>
+<script src="assets/runtime.js"></script>
+<script src="assets/animations/fx-runtime.js"></script>
+<script>
+/* === FIXED 16:9 VIEWPORT SCALING === */
+(function(){
+  const deck = document.querySelector('.deck');
+  function fitDeck(){
+    if (!deck) return;
+    const scale = Math.min(window.innerWidth / 1920, window.innerHeight / 1080);
+    const x = (window.innerWidth - 1920 * scale) / 2;
+    const y = (window.innerHeight - 1080 * scale) / 2;
+    deck.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
+  }
+  window.addEventListener('resize', fitDeck);
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', fitDeck);
+  } else {
+    fitDeck();
+  }
+})();
+
+/* === INTERACTIVE PROMPT LAB === */
+(function(){
+  const output = document.getElementById('promptOutput');
+  const data = {
+    "食品": {
+      title: "食品类提示词骨架",
+      line: "突出食欲感、真实生活场景、产地/新鲜/健康信任，以及适合下单或送礼的理由。",
+      prompt: "你是一位食品电商策划，请为【产品名称】生成适合朋友圈种草和详情页首屏的文案。目标人群是【人群】，核心痛点是【痛点】。请突出【口感/产地/新鲜/健康/方便】和【购买理由】，风格真实、有食欲、有生活感。"
+    },
+    "美妆": {
+      title: "美妆类提示词骨架",
+      line: "突出成分、肤感、使用体验和变美理由，表达要真实克制，不夸大功效。",
+      prompt: "你是一位美妆种草内容策划，请为【产品名称】生成真实种草文案。目标人群是【肤质/年龄/需求】，痛点是【痛点】。请围绕【成分/肤感/使用体验/功效感受】展开，语气精致但不夸大，适合私域朋友圈发布。"
+    },
+    "家清": {
+      title: "家清类提示词骨架",
+      line: "突出干净、省心、安心、安全感和家庭使用场景，让用户感到实用且值得买。",
+      prompt: "你是一位家清日化产品策划，请为【产品名称】生成转化文案。目标人群是【家庭用户/宝妈/租房人群】，痛点是【清洁困扰】。请突出【去污/除菌/省心/安全/性价比】，加入真实家庭场景，并给出明确行动引导。"
+    },
+    "课程": {
+      title: "课程服务提示词骨架",
+      line: "突出学完能解决什么问题、适合谁、交付什么结果，以及为什么现在要报名。",
+      prompt: "你是一位课程转化文案策划，请为【课程名称】生成招生文案。目标人群是【人群】，当前困扰是【痛点】。请讲清楚课程能带来的【具体结果】，包含适合人群、学习收获、信任背书和报名行动，语气专业、有实战感。"
+    }
+  };
+
+  function render(kind){
+    const item = data[kind];
+    output.innerHTML = `<strong>${item.title}</strong><br><br>${item.line}<br><br><span class="muted">${item.prompt}</span>`;
+  }
+
+  document.querySelectorAll('.product-tabs button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.product-tabs button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      render(btn.dataset.kind);
+    });
+  });
+  render('食品');
+})();
+</script>
+</body>
+</html>
